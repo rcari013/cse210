@@ -16,7 +16,7 @@ line369 = []
 line159 = []
 line357 = []
 turn = ""
-#comment
+
 #for scanning the lines
 all_line_list = []
 
