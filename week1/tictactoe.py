@@ -1,5 +1,5 @@
 import os
-from importlib.machinery import WindowsRegistryFinder
+
 from colored import fg
 
 #color variables for erron messaging
