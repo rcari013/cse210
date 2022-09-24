@@ -14,8 +14,7 @@ class Director:
         Args:
             self (Director): an instance of Director.
         """
-
-        
+       
         self.is_playing = True
         card = Card()
         self.card = card.card_num
@@ -25,7 +24,6 @@ class Director:
 
     def start_game(self):
         """Starts the game by running the main game loop.
-        
         Args:
             self (Director): an instance of Director.
         """
@@ -48,12 +46,18 @@ class Director:
 
     
     def compare_previous_and_current_card_and_then_updates(self):
+        """Compares the previous card and the next card if it's equal. If it's equal, no need to change the card in to next card, if not, then the next card will be the previous card
+        Args:
+            self (Director): an instance of Director.
+        """
+
         if self.next_card == self.card:
             pass
         else:
             self.card = self.next_card
 
-    @classmethod        
+    @classmethod #I had to google this one since I need to make a method that is name below. It checks both inputs which is either l or h and then computes the points as well.
+    #this is a class method for me use like a normal method for checking inputs and updating scores
     def check_inputs_and_update_points(cls, guess, card, next_card, points_for_players):
         cls.card = card
         cls.next_card = next_card
@@ -83,12 +87,24 @@ class Director:
                        
             
     def show_points(self):
+        """This is to show the current points number
+                Args:
+            self (Director): an instance of Director.
+        """
         print("Your score is " + str(self.points_for_players))
 
     def reveal_previous_card(self):
+        """This is to show previous card number
+                Args:
+            self (Director): an instance of Director.
+        """
         print("The card is " + str(self.card))
 
     def check_if_players_points_is_not_below_or_equal_to_zero_and_if_player_still_wants_to_play_the_game(self):
+        """I combined this method plus the if the player wants to continue the game to make the game flow easier. If the points is already negative or 0, then the program stops without asking players to play the game again.
+                Args:
+            self (Director): an instance of Director.
+        """
         current_points = Director.points_for_players
         if current_points <= 0:
             print("You points is now below or equal to 0.")
@@ -98,13 +114,25 @@ class Director:
             self.director_checks_if_player_wants_to_continue()
 
     def reveal_next_card(self):
+        """This is to reveal the next card.
+                Args:
+            self (Director): an instance of Director.
+        """
         print("Next card was " + str(self.next_card))
 
     def get_the_guess_of_the_player(self):
+        """This is to get an input of l or h
+                Args:
+            self (Director): an instance of Director.
+        """
         players_guess = input("Higher or lower? [h/l] ")
         return players_guess
 
     def director_checks_if_player_wants_to_continue(self):
+        """This is to check if the player still wants to play, the other else condition is only for validating the input entered by the player.
+                Args:
+            self (Director): an instance of Director.
+        """
         answer = input("Do you still want to play the game?[y/n] ").lower()
         if answer == 'y':
             print("")
