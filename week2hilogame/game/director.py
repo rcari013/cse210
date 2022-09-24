@@ -1,17 +1,12 @@
-from game.die import Die
+from re import L
+from game.card import Card
 
 
 class Director:
-    """A person who directs the game. 
+    #Players points and guess
+    points_for_players = 300
+    guess = ""
     
-    The responsibility of a Director is to control the sequence of play.
-
-    Attributes:
-        dice (List[Die]): A list of Die instances.
-        is_playing (boolean): Whether or not the game is being played.
-        score (int): The score for one round of play.
-        total_score (int): The score for the entire game.
-    """
 
     def __init__(self):
         """Constructs a new Director.
@@ -19,15 +14,14 @@ class Director:
         Args:
             self (Director): an instance of Director.
         """
-        self.dice = []
-        self.is_playing = True
-        self.score = 0
-        self.total_score = 0
-        self.previous_score = 0
 
-        for i in range(5):
-            die = Die()
-            self.dice.append(die)
+        
+        self.is_playing = True
+        card = Card()
+        self.card = card.card_num
+        self.continue_game = True
+        self.next_card = 0
+        
 
     def start_game(self):
         """Starts the game by running the main game loop.
@@ -35,62 +29,93 @@ class Director:
         Args:
             self (Director): an instance of Director.
         """
+        print("You starting points is " + str(Director.points_for_players) + "\n")
         while self.is_playing:
-            self.get_inputs()
-            self.do_updates()
-            self.do_outputs()
+            self.reveal_previous_card()
+            guess = self.get_the_guess_of_the_player()
+            if guess == 'l' or guess == 'h':
+                next_card = Card()
+                self.next_card = next_card.card_num
+                self.reveal_next_card()
+                Director.check_inputs_and_update_points(guess, self.card, self.next_card, Director.points_for_players)
+                self.compare_previous_and_current_card_and_then_updates()
+                self.check_if_players_points_is_not_below_or_equal_to_zero_and_if_player_still_wants_to_play_the_game()
+                
+            else:
+                print("Invalid input")
+                print("You points is still " + str(Director.points_for_players))
+                print("The card is still " + str(self.card) + "\n")
 
-    def get_inputs(self):
-        """Ask the user if they want to roll.
+    
+    def compare_previous_and_current_card_and_then_updates(self):
+        if self.next_card == self.card:
+            pass
+        else:
+            self.card = self.next_card
 
-        Args:
-            self (Director): An instance of Director.
-        """
-        roll_dice = input("Roll dice? [y/n] ")
-        self.is_playing = (roll_dice == "y")
-
-       
-    def do_updates(self):
-        """Updates the player's score.
-
-        Args:
-            self (Director): An instance of Director.
-        """
-        if not self.is_playing:
-            return 
-
-        for i in range(len(self.dice)):
-            die = self.dice[i]
+    @classmethod        
+    def check_inputs_and_update_points(cls, guess, card, next_card, points_for_players):
+        cls.card = card
+        cls.next_card = next_card
+        cls.guess = guess
+        cls.points_for_players = points_for_players
+        if cls.next_card > cls.card and cls.guess == 'h':
+            Director.points_for_players += 100
+            print("Your points is now "+ str(Director.points_for_players))
             
-            die.roll()
-            self.score += die.points 
-        self.total_score += self.score
-        self.previous_score = self.score
-        self.score = 0
+        elif cls.next_card < cls.card and cls.guess  == 'l':
+            Director.points_for_players += 100
+            print("Your points is now "+ str(Director.points_for_players))
+            
+        elif cls.next_card < cls.card and cls.guess == 'h':
+            Director.points_for_players -= 75
+            print("Your points is now "+ str(Director.points_for_players))
+            
+        elif cls.next_card > cls.card and cls.guess == 'l':
+            Director.points_for_players -= 75
+            current_points = Director.points_for_players
+            print("Your points is now "+ str(current_points))
+            
+        elif (cls.next_card == cls.card) and (cls.guess == 'l' or cls.guess == 'h'):
+            Director.points_for_players += 0
+            print("Cards are equal. No points added.")
+            print("The number of points is still " + str(Director.points_for_players))
+                       
+            
+    def show_points(self):
+        print("Your score is " + str(self.points_for_players))
 
-    def do_outputs(self):
-        """Displays the dice and the score. Also asks the player if they want to roll again. 
+    def reveal_previous_card(self):
+        print("The card is " + str(self.card))
 
-        Args:
-            self (Director): An instance of Director.
-        """
-        if not self.is_playing:
-            return
-        
-        values = ""
-        for i in range(len(self.dice)):
-            die = self.dice[i]
-            values += f"{die.value} "
-
-        print(f"You rolled: {values}")
-        if self.previous_score == 0:
-            print(f"No 1s or 5s are present. This game is over.\n")
-            print(f"Your highest score is: {self.total_score}\n")
+    def check_if_players_points_is_not_below_or_equal_to_zero_and_if_player_still_wants_to_play_the_game(self):
+        current_points = Director.points_for_players
+        if current_points <= 0:
+            print("You points is now below or equal to 0.")
+            print("Game Over!")
             self.is_playing = False
         else:
-            print(f"Your score is: {self.total_score}\n")
-            self.is_playing == (self.score == 0)
-        
-        
-        
-        
+            self.director_checks_if_player_wants_to_continue()
+
+    def reveal_next_card(self):
+        print("Next card was " + str(self.next_card))
+
+    def get_the_guess_of_the_player(self):
+        players_guess = input("Higher or lower? [h/l] ")
+        return players_guess
+
+    def director_checks_if_player_wants_to_continue(self):
+        answer = input("Do you still want to play the game?[y/n] ").lower()
+        if answer == 'y':
+            print("")
+        elif answer == 'n':
+            print("Game over!")
+            self.is_playing = False
+        else:
+            self.director_tells_you_invalid_y_or_n_if_invalid_input()
+
+    def director_tells_you_invalid_y_or_n_if_invalid_input(self):
+        print("\nYou did not enter a correct response")
+        print("Your points is still: " + str(Director.points_for_players))
+        print("Card number is still: " + str(self.card))
+        self.director_checks_if_player_wants_to_continue()
