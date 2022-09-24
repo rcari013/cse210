@@ -318,7 +318,5 @@ def clear_all_array():
     line357.clear()
     numbers_taken.clear()    
 
-
 if __name__ == "__main__":
     main()
-        
